@@ -1,34 +1,18 @@
 {
   "name": "prawns",
-  "version": "1.0.0",
-  "description": "a secure password breach checker.",
-  "main": "server.js",
+  "version": "2.0.0",
+  "description": "A password breach checker with k-anonymity lookups, backed by Redigo.",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "ingest": "node scripts/ingest.js",
+    "test": "node --test test/*.test.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vardh-man/prawns.git"
-  },
-  "keywords": [
-    "password",
-    "breach",
-    "passwordbreackchecker",
-    "prawns"
-  ],
+  "repository": { "type": "git", "url": "git+https://github.com/flcrom/prawns.git" },
+  "keywords": ["password", "breach", "k-anonymity", "prawns"],
   "author": "Vardhman",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/vardh-man/prawns/issues"
-  },
-  "homepage": "https://github.com/vardh-man/prawns#readme",
-  "dependencies": {
-    "crypto": "^1.0.1",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "fs": "^0.0.1-security",
-    "nodemon": "^3.1.10",
-    "redis": "^5.8.2"
-  }
+  "bugs": { "url": "https://github.com/flcrom/prawns/issues" },
+  "homepage": "https://github.com/flcrom/prawns#readme",
+  "dependencies": { "dotenv": "^17.2.2", "express": "^5.1.0" }
 }
