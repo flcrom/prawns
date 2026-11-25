@@ -14,7 +14,7 @@ One Redigo list per hash prefix: key `p:<PREFIX>` (uppercase hex), one element p
 node scripts/ingest.js --file rockyou.txt --limit 1000000 --prefix-len 4
 ```
 
-Reads the first `--limit` lines of the file, SHA-1 hashes each password and RPUSHes the suffix into its prefix list, then reads every list back. Plaintext is never stored or logged. A line counts toward the limit even if it is skipped. Skipped lines: empty lines, and lines that are not valid UTF-8 (a browser hashes UTF-8 text, so it could never match them). Counts of both are in the report. It exits non-zero and does not write the ready marker if any list fails the readback.
+Reads the first `--limit` lines of the file, SHA-1 hashes each password and RPUSHes the suffix into its prefix list, then reads every list back. Plaintext is never stored or logged. A line counts toward the limit even if it is skipped. Two kinds of line are skipped, for different reasons. Empty lines are skipped as a policy choice: a browser could hash an empty string, but a breach checker has no use for an empty password. Lines that are not valid UTF-8 are skipped for encoding compatibility: a browser hashes UTF-8 text, so it cannot produce the hash of those raw bytes. Counts of both are in the report. It exits non-zero and does not write the ready marker if any list fails the readback.
 
 Hashes of common passwords are easy to reverse. Keep wordlists and Redigo off public networks.
 

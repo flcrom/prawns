@@ -6,8 +6,8 @@
 // the prawns:meta key that the server uses to decide it is ready.
 //
 // Lines are counted as they appear in the file. A line is skipped (but still counts toward
-// the limit) if it is empty or is not valid UTF-8, because a browser hashes UTF-8 text and
-// could never match a hash of other bytes. Skip counts are reported.
+// the limit) if it is empty (a policy choice) or is not valid UTF-8 (a browser hashes UTF-8
+// text and cannot produce a hash of other bytes). Skip counts are reported.
 const fs = require('fs');
 const crypto = require('crypto');
 const { RespClient } = require('../src/lib/resp');
