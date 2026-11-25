@@ -21,7 +21,10 @@ function createApp({ store, rateLimitPerMin = 120 }) {
 
   async function readMeta() {
     const raw = await store.command('GET', META_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const meta = JSON.parse(raw);
+    // Only a fully verified load counts. 'loading' means a load started and has not finished.
+    return meta.status === 'ready' ? meta : null;
   }
 
   app.get('/healthz', async (req, res) => {

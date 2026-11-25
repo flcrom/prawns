@@ -8,7 +8,7 @@ const a = process.argv.slice(2);
 const arg = (k, d) => (a.includes(k) ? a[a.indexOf(k) + 1] : d);
 const file = arg('--file'); const pl = Number(arg('--prefix-len', 4)); const url = arg('--url', 'http://127.0.0.1:3000');
 const n = Number(arg('--n', 3000)); const conc = Number(arg('--conc', 16));
-const words = fs.readFileSync(file, 'utf8').split('\n').slice(0, 1000000);
+const words = fs.readFileSync(file, 'utf8').split('\n').slice(0, 1000000).filter((w) => w && !w.includes('\uFFFD') && !w.endsWith('\r'));
 let idx = 0, bad = 0, done = 0;
 async function worker() {
   while (idx < n) {

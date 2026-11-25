@@ -34,12 +34,17 @@ const fake = (data) => ({ command: async (c, k) => (c === 'GET' ? data[k] || nul
 
 test('api: 503 before load, 400 on bad prefix, suffixes when ready, raw-password route gone', async () => {
   assert.strictEqual((await call(createApp({ store: fake({}) }), '/healthz')).status, 503);
-  const meta = JSON.stringify({ prefixLen: 4, entries: 2 });
+  const meta = JSON.stringify({ status: 'ready', prefixLen: 4, entries: 2 });
   const app = createApp({ store: fake({ 'prawns:meta': meta, 'p:5BAA': ['AA', 'BB'] }) });
   assert.strictEqual((await call(app, '/api/range/zz')).status, 400);
   assert.deepStrictEqual((await call(app, '/api/range/5baa')).body, { prefix: '5BAA', suffixes: ['AA', 'BB'] });
   assert.strictEqual((await call(app, '/api/range/0000')).body.suffixes.length, 0);
   assert.strictEqual((await call(app, '/checkPass')).status, 404);
+});
+test('api: a half-loaded store (status loading) is not ready', async () => {
+  const app = createApp({ store: fake({ 'prawns:meta': JSON.stringify({ status: 'loading' }), 'p:5BAA': ['AA'] }) });
+  assert.strictEqual((await call(app, '/healthz')).status, 503);
+  assert.strictEqual((await call(app, '/api/range/5BAA')).status, 503);
 });
 test('api: rate limit', async () => {
   const app = createApp({ store: fake({}), rateLimitPerMin: 2 });

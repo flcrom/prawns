@@ -28,6 +28,11 @@ test('ingest: first N lines, skips empty and non-UTF-8, readback, API answers', 
     assert.strictEqual(rep.readbackMismatches, 0);
 
     const c = await new RespClient().connect();
+    assert.strictEqual(JSON.parse(await c.command('GET', 'prawns:meta')).status, 'ready');
+    // A second ingest into the same store must refuse and leave the ready marker alone.
+    let code = 0;
+    try { execFileSync('node', ['scripts/ingest.js', '--file', f, '--limit', '6', '--prefix-len', '3'], { stdio: 'ignore' }); } catch (e) { code = e.status; }
+    assert.strictEqual(code, 2);
     const { prefix, suffix } = split(sha1Hex('héllo'), 3);
     assert.ok((await c.command('LRANGE', listKey(prefix), 0, -1)).includes(suffix));
     const { prefix: np } = split(sha1Hex('beyondlimit'), 3);

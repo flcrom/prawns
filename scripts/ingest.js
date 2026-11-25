@@ -55,6 +55,15 @@ async function main() {
   const client = await new RespClient({ host: o.host, port: o.port, timeoutMs: 30000 }).connect();
   await client.command('PING');
 
+  // Fail closed on partial loads. Redigo has no DEL, so a store that has ever been marked
+  // cannot be cleaned: restart Redigo (it is empty on start) and ingest into the fresh process.
+  if (await client.command('GET', META_KEY)) {
+    console.error('store already has a prawns:meta marker (loaded or half-loaded). Restart Redigo and ingest again.');
+    process.exit(2);
+  }
+  // Written before any data, so a crash mid-load leaves the store not ready.
+  await client.command('SET', META_KEY, JSON.stringify({ status: 'loading', startedAt: new Date().toISOString() }));
+
   const expected = new Map(); // prefix -> array of suffixes in push order
   const st = { linesRead: 0, emptyLines: 0, invalidUtf8Lines: 0, hashed: 0, duplicateHashes: 0 };
   const seen = new Set();
@@ -123,7 +132,7 @@ async function main() {
     console.error('readback failed; not marking the store ready');
     process.exitCode = 1;
   } else {
-    const meta = { version: 1, prefixLen: o.prefixLen, entries: st.hashed, lists: prefixes.length, loadedAt: new Date().toISOString() };
+    const meta = { status: 'ready', version: 1, prefixLen: o.prefixLen, entries: st.hashed, lists: prefixes.length, loadedAt: new Date().toISOString() };
     await client.command('SET', META_KEY, JSON.stringify(meta));
     console.log('ready marker written');
   }
