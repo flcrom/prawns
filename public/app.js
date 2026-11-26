@@ -15,11 +15,39 @@ $('rrows').addEventListener('scroll', () => {
   b.classList.toggle('more-below', b.scrollTop + b.clientHeight < b.scrollHeight - 2);
 }, {passive: true});
 
+// briefly reveal the last typed character at its position, then mask it again.
+// the real input stays type=password; only a single freshly typed char is shown,
+// never the whole value, and never pasted/autofilled (multi-char) insertions.
+let pwPrev = '';
+let hintTimer = 0;
+const hint = $('keyhint');
+function hideHint(){ clearTimeout(hintTimer); hint.style.opacity = 0; }
+function revealChar(ch, idx){
+  const i = $('pw');
+  const cs = getComputedStyle(i);
+  const cv = revealChar._cv || (revealChar._cv = document.createElement('canvas').getContext('2d'));
+  cv.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const ls = parseFloat(cs.letterSpacing) || 0;
+  const cw = cv.measureText('X').width + ls;
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  hint.style.font = `${cs.fontWeight} ${cs.fontSize}/${cs.lineHeight} ${cs.fontFamily}`;
+  hint.style.letterSpacing = cs.letterSpacing;
+  hint.style.left = (i.offsetLeft + padL + idx * cw - i.scrollLeft) + 'px';
+  hint.style.top = i.offsetTop + 'px';
+  hint.style.height = i.offsetHeight + 'px';
+  hint.textContent = ch;
+  hint.style.opacity = 1;
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(hideHint, 650);
+}
+$('pw').addEventListener('blur', hideHint);
+
 // show/hide password
 $('eye').addEventListener('click', () => {
   const i = $('pw');
   const show = i.type === 'password';
   i.type = show ? 'text' : 'password';
+  hideHint();
   $('eye').setAttribute('aria-label', show ? 'hide password' : 'show password');
   $('eye').style.color = show ? 'var(--ink)' : '';
   i.focus();
@@ -52,9 +80,20 @@ $('pw').addEventListener('input', () => {
   $('verdict').textContent = '';
   $('verdict').classList.remove('on');
   note('');
+  const i = $('pw');
+  const v = i.value, p = pwPrev;
+  pwPrev = v;
+  if (i.type !== 'password') { hideHint(); return; }
+  let pre = 0;
+  while (pre < v.length && pre < p.length && v[pre] === p[pre]) pre++;
+  let suf = 0;
+  while (suf < v.length - pre && suf < p.length - pre && v[v.length - 1 - suf] === p[p.length - 1 - suf]) suf++;
+  if (v.length === p.length + 1 && pre + suf === p.length) revealChar(v[pre], pre);
+  else hideHint();
 });
 $('form').addEventListener('submit', async ev => {
   ev.preventDefault();
+  hideHint();
   const pw = $('pw').value;
   if (!pw) return;
   const mine = ++seq;
