@@ -14,7 +14,7 @@
 html.dark{--bg:#0c0c0c;--ink:#f4f4f4;--ink2:#9c9c9c;--line:#262626;--invb:#f4f4f4;--invi:#0c0c0c;color-scheme:dark}
 *{margin:0;box-sizing:border-box}
 html,body{background:var(--bg)}
-body{color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+body{color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
 .mono{font-family:JBM,monospace}
 .lbl{font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
 .hdr{display:flex;justify-content:space-between;align-items:center;padding:18px 20px}
@@ -31,7 +31,7 @@ html.dark .logo{filter:invert(1)}
 .go svg{width:17px;height:17px;display:block}
 .go:hover{opacity:.85}
 .note{margin:14px 20px 0;font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);display:none}
-.flow{margin:32px 20px 60px;display:none;flex-direction:column}
+.flow{margin:auto 20px;padding:32px 0 60px;display:none;flex-direction:column}
 .flow.on{display:flex}
 .steps,.n3row{display:contents}
 .node{display:flex;align-items:center;gap:14px;border:1px solid var(--line);padding:13px 14px;background:var(--bg)}
@@ -68,7 +68,7 @@ button:focus-visible,[tabindex]:focus-visible{outline:1px solid var(--ink);outli
  .fin input{font-size:44px}
  .note{margin:14px auto 0;max-width:960px}
  .verdict{margin:34px auto 0;max-width:960px;font-size:16px}
- .flow{flex-direction:row;align-items:center;justify-content:space-between;width:960px;max-width:100%;margin:44px auto 60px;padding:0}
+ .flow{flex-direction:row;align-items:center;justify-content:space-between;width:960px;max-width:100%;margin:auto;padding:44px 0 60px}
  .rrows{max-height:300px}
  .fin{padding:14px 16px}
  .eye{width:44px;height:44px}
@@ -102,18 +102,21 @@ html.dark .bgl i{opacity:.13}
 .bgl .a{--m:url(bg/s2.png);--ar:700/531;width:150px;left:-30px;bottom:6%;transform:rotate(-6deg)}
 .bgl .b{--m:url(bg/s1.png);--ar:700/522;width:130px;right:-24px;top:46%;transform:rotate(10deg) scaleX(-1)}
 .bgl .c{--m:url(bg/s4.png);--ar:700/479;width:150px;right:-30px;bottom:-14px;transform:rotate(-4deg)}
-.bgl .d,.bgl .e{display:none}
+.bgl .d,.bgl .e,.bgl .g{display:none}
+.bgl .f{--m:url(bg/s4.png);--ar:700/479;width:110px;left:-24px;top:5%;transform:rotate(12deg)}
 @media (min-width:1000px){
  .bgl .a{width:300px;left:-60px;bottom:5%}
  .bgl .b{width:240px;right:-50px;top:14%}
  .bgl .c{width:320px;right:-40px;bottom:-30px}
  .bgl .d{display:block;--m:url(bg/s3.png);--ar:700/428;width:250px;left:2.5%;top:36%;transform:rotate(5deg)}
  .bgl .e{display:block;--m:url(bg/s2.png);--ar:700/531;width:170px;right:5%;top:58%;transform:rotate(14deg) scaleX(-1)}
+ .bgl .f{width:210px;left:-50px;top:4%}
+ .bgl .g{display:block;--m:url(bg/s3.png);--ar:700/428;width:150px;right:16%;top:4%;transform:rotate(-9deg) scaleX(-1)}
 }
 </style>
 </head>
 <body>
-<div class="bgl" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><i class="e"></i></div>
+<div class="bgl" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i><i class="e"></i><i class="f"></i><i class="g"></i></div>
 <div class="hdr">
   <img class="logo" src="prawn.png" alt="prawns">
   <button class="tgl" id="tgl" aria-label="toggle dark mode"><svg viewBox="0 0 18 18" width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1"/><path d="M9 1.5 A7.5 7.5 0 0 0 9 16.5 Z" fill="currentColor"/></svg></button>
