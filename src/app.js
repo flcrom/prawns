@@ -9,6 +9,21 @@ function createApp({ store, rateLimitPerMin = 120 }) {
   const app = express();
   app.disable('x-powered-by');
 
+  // The app is fully self-hosted; nothing may load or beacon to third parties.
+  // Blocks edge-injected analytics (e.g. Cloudflare RUM) without zone changes.
+  const CSP = [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "base-uri 'none'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+  app.use((req, res, next) => { res.set('Content-Security-Policy', CSP); next(); });
+
   const hits = new Map();
   // Only API lookups count against the budget: static assets must not 429 the page.
   // Client key: CF-Connecting-IP is set/overwritten by the Cloudflare edge, and the
