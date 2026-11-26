@@ -1,5 +1,6 @@
 'use strict';
 const { spawn } = require('child_process');
+const path = require('path');
 const express = require('express');
 const { isValidPrefix, listKey, META_KEY } = require('./lib/hash');
 
@@ -9,7 +10,9 @@ function createApp({ store, rateLimitPerMin = 120 }) {
   app.disable('x-powered-by');
 
   const hits = new Map();
-  app.use((req, res, next) => {
+  // Only API lookups count against the budget: static assets must not 429 the page,
+  // and behind the tunnel every visitor shares one req.ip.
+  app.use('/api', (req, res, next) => {
     const now = Date.now();
     const key = req.ip;
     const rec = hits.get(key) || { n: 0, reset: now + 60000 };
@@ -69,6 +72,8 @@ function notifyLookup(prefix) {
       res.status(503).json({ error: 'store_unavailable' });
     }
   });
+
+  app.use(express.static(path.join(__dirname, '..', 'public')));
 
   app.use((req, res) => res.status(404).json({ error: 'not_found' }));
   return app;

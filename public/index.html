@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Prawns checks whether a password appears in a breach corpus using k-anonymity: only the first 4 characters of the hash are looked up.">
+<title>prawns</title>
+<link rel="icon" type="image/png" href="prawn.png">
+<style>
+@font-face{font-family:Inter;src:url(fonts/var-Inter.woff2) format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:JBM;src:url(fonts/var-JetBrainsMono.woff2) format('woff2');font-weight:100 800;font-display:swap}
+:root{--bg:#fff;--ink:#101010;--ink2:#8a8a8a;--line:#e5e5e5;--invb:#101010;--invi:#fff}
+html.dark{--bg:#0c0c0c;--ink:#f4f4f4;--ink2:#9c9c9c;--line:#262626;--invb:#f4f4f4;--invi:#0c0c0c}
+*{margin:0;box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.mono{font-family:JBM,monospace}
+.lbl{font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:18px 20px}
+.logo{height:36px;width:auto;display:block}
+html.dark .logo{filter:invert(1)}
+.tgl{background:none;border:none;color:var(--ink);padding:6px;cursor:pointer;display:flex}
+.field{margin:86px 20px 0}
+.fin{width:100%;display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid var(--ink);padding-bottom:10px}
+.fin input{font:400 24px JBM,monospace;letter-spacing:.5px;flex:1;min-width:0;background:none;border:none;outline:none;color:var(--ink);padding:0;caret-color:var(--ink)}
+.fin input::placeholder{color:var(--ink2);opacity:.55}
+.eye{background:none;border:none;color:var(--ink2);padding:4px;cursor:pointer;display:flex}
+.cap{border:1px solid var(--line);border-radius:3px;padding:3px 7px;font:500 10px JBM,monospace;color:var(--ink2);background:none;cursor:pointer}
+.note{margin:14px 20px 0;font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);display:none}
+.flow{margin:52px 20px 60px;display:none;flex-direction:column}
+.flow.on{display:flex}
+.steps,.n3row{display:contents}
+.node{display:flex;align-items:center;gap:14px;border:1px solid var(--line);padding:13px 14px;background:var(--bg)}
+.node>svg{flex:0 0 auto;color:var(--ink)}
+.nt{min-width:0;flex:1}
+.nt .lbl{display:block;margin-bottom:5px}
+.dots{font-family:JBM,monospace;font-size:13px;letter-spacing:2px}
+.hashline{font-family:JBM,monospace;display:block;font-size:11px;letter-spacing:.02em;line-height:1.9;word-break:break-all}
+.wire{position:relative;height:40px;flex:0 0 auto;color:var(--ink)}
+.wl{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--ink)}
+.ah{position:absolute;color:var(--ink)}
+.ah-v{left:50%;bottom:-1px;transform:translateX(-50%)}
+.ah-h{display:none;right:-1px;top:50%;transform:translateY(-50%)}
+.wchip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--bg);border:1px solid var(--ink);padding:2px 7px;font-size:11.5px}
+.wlbl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--bg);padding:2px 6px;white-space:nowrap}
+.result{border:1px solid var(--line);background:var(--bg)}
+.rhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:11px 14px;border-bottom:1px solid var(--ink)}
+.rrows{padding:2px 14px 4px}
+.rrow{padding:7px 0;border-bottom:1px solid var(--line)}
+.rrow .mono{font-size:11px}
+.rhit{background:var(--invb);color:var(--invi);padding:8px 14px;margin:0 -14px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:none}
+.rhit .mono{font-size:11.5px;word-break:break-all;min-width:0}
+.rhit .lbl{color:var(--invi);flex:0 0 auto}
+.struck{color:var(--ink2);text-decoration:line-through;text-decoration-color:var(--ink2)}
+.rmore{text-align:center;border-bottom:none}
+.morebtn{background:none;border:none;cursor:pointer;font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:4px}
+.box4{border:1px solid var(--ink);padding:1px 3px}
+.verdict{margin:0 20px 60px;text-align:center}
+button:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
+@media (min-width:1000px){
+ .hdr{padding:22px 40px}
+ .field{margin:130px auto 0;max-width:880px;padding:0}
+ .fin input{font-size:44px}
+ .note{margin:14px auto 0;max-width:880px}
+ .flow{flex-direction:row;align-items:center;justify-content:space-between;width:880px;max-width:100%;margin:96px auto 60px;padding:0}
+ .steps{display:flex;flex-direction:column;flex:0 0 360px;min-width:0}
+ .n3row{display:flex;align-items:center;width:520px}
+ .n3{flex:1;min-width:0}
+ .w3{width:160px;flex:0 0 auto}
+ .w3 .wl{left:0;right:0;top:50%;bottom:auto;width:auto;height:1px}
+ .w3 .ah-v{display:none}
+ .w3 .ah-h{display:block}
+ .w3 .wlbl{top:16%}
+ .result{width:360px;flex:0 0 auto}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <img class="logo" src="prawn.png" alt="prawns">
+  <button class="tgl" id="tgl" aria-label="toggle dark mode"><svg viewBox="0 0 18 18" width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1"/><path d="M9 1.5 A7.5 7.5 0 0 0 9 16.5 Z" fill="currentColor"/></svg></button>
+</div>
+<form class="field" id="form" autocomplete="off">
+  <div class="fin">
+    <input id="pw" type="password" placeholder="password" aria-label="password to check" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus>
+    <button type="button" class="eye" id="eye" aria-label="show password"><svg width="22" height="22" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/></svg></button>
+    <button type="submit" class="cap" aria-label="check password">return</button>
+  </div>
+</form>
+<div class="note" id="note"></div>
+<div class="flow" id="flow">
+  <div class="steps">
+    <div class="node n1"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="5" y="1.5" width="8" height="15" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/><line x1="8" y1="13.8" x2="10" y2="13.8" stroke="currentColor" stroke-width="1"/></svg><div class="nt"><span class="lbl">you type</span><span class="dots" id="dots"></span></div></div>
+    <div class="wire w1"><span class="wl"></span><svg class="ah ah-v" width="11" height="7" viewBox="0 0 11 7"><path d="M0.5 0.5 L5.5 6.5 L10.5 0.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><svg class="ah ah-h" width="7" height="11" viewBox="0 0 7 11"><path d="M0.5 0.5 L6.5 5.5 L0.5 10.5" fill="none" stroke="currentColor" stroke-width="1"/></svg></div>
+    <div class="node n2"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="1.5" y="3" width="15" height="12.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/><line x1="1.5" y1="7" x2="16.5" y2="7" stroke="currentColor" stroke-width="1"/><circle cx="4" cy="5" r="0.9" fill="currentColor"/><circle cx="6.6" cy="5" r="0.9" fill="currentColor"/></svg><div class="nt"><span class="lbl">browser hashes · sha-1</span><span class="hashline" id="hashline"></span></div></div>
+    <div class="wire w2"><span class="wl"></span><svg class="ah ah-v" width="11" height="7" viewBox="0 0 11 7"><path d="M0.5 0.5 L5.5 6.5 L10.5 0.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><svg class="ah ah-h" width="7" height="11" viewBox="0 0 7 11"><path d="M0.5 0.5 L6.5 5.5 L0.5 10.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="wchip mono" id="chip"></span></div>
+    <div class="n3row">
+      <div class="node n3"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="2.5" y="2" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="7.5" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="13" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="5" cy="4" r="0.9" fill="currentColor"/><circle cx="5" cy="9.5" r="0.9" fill="currentColor"/><circle cx="5" cy="15" r="0.9" fill="currentColor"/></svg><div class="nt"><span class="lbl">server</span></div></div>
+      <div class="wire w3"><span class="wl"></span><svg class="ah ah-v" width="11" height="7" viewBox="0 0 11 7"><path d="M0.5 0.5 L5.5 6.5 L10.5 0.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><svg class="ah ah-h" width="7" height="11" viewBox="0 0 7 11"><path d="M0.5 0.5 L6.5 5.5 L0.5 10.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="wlbl lbl" id="w3lbl"></span></div>
+    </div>
+  </div>
+  <div class="result">
+    <div class="rhead"><span class="lbl" id="rhead-l"></span><span class="lbl" id="rhead-r"></span></div>
+    <div class="rrows" id="rrows"></div>
+  </div>
+</div>
+<div class="verdict lbl" id="verdict"></div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const root = document.documentElement;
+
+// theme: light default, toggle persists; icon color comes from CSS (currentColor = --ink)
+try { if (localStorage.getItem('prawns-theme') === 'dark') root.classList.add('dark'); } catch {}
+$('tgl').addEventListener('click', () => {
+  root.classList.toggle('dark');
+  try { localStorage.setItem('prawns-theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch {}
+});
+
+// show/hide password
+$('eye').addEventListener('click', () => {
+  const i = $('pw');
+  const show = i.type === 'password';
+  i.type = show ? 'text' : 'password';
+  $('eye').setAttribute('aria-label', show ? 'hide password' : 'show password');
+  $('eye').style.color = show ? 'var(--ink)' : '';
+  i.focus();
+});
+
+async function sha1hex(text){
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+function note(msg){
+  const n = $('note');
+  n.textContent = msg || '';
+  n.style.display = msg ? 'block' : 'none';
+}
+
+function esc(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let seq = 0;
+$('pw').addEventListener('input', () => {
+  seq++; // invalidate any in-flight lookup
+  $('flow').classList.remove('on');
+  $('verdict').textContent = '';
+  note('');
+});
+$('form').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const pw = $('pw').value;
+  if (!pw) return;
+  const mine = ++seq;
+  note('');
+  let hash;
+  try { hash = await sha1hex(pw); }
+  catch { note('hashing is unavailable in this browser'); return; }
+  const prefix = hash.slice(0, 4), suffix = hash.slice(4);
+
+  let data;
+  try {
+    const res = await fetch('/api/range/' + prefix, { headers: { 'Accept': 'application/json' } });
+    if (res.status === 503) { note('the corpus is loading · try again in a moment'); return; }
+    if (res.status === 429) { note('slow down a little · try again shortly'); return; }
+    if (!res.ok) { note('the lookup failed · try again'); return; }
+    data = await res.json();
+  } catch {
+    note('could not reach the server · check your connection');
+    return;
+  }
+  if (mine !== seq) return; // a newer lookup superseded this one
+
+  const suffixes = Array.isArray(data.suffixes) ? data.suffixes : [];
+  const found = suffixes.includes(suffix);
+
+  $('dots').textContent = '•'.repeat(pw.length);
+  $('hashline').innerHTML = `<span class="box4">${prefix}</span><span style="color:var(--ink2)">${esc(suffix)}</span>`;
+  $('chip').textContent = prefix;
+  $('w3lbl').textContent = `${suffixes.length} suffixes`;
+  $('rhead-l').textContent = `device compares · prefix ${prefix}`;
+  $('rhead-r').textContent = found ? '1 match' : '0 matches';
+  const rowHtml = s =>
+    s === suffix
+      ? `<div class="rhit"><span class="mono">${esc(s)}</span><span class="lbl">yours</span></div>`
+      : `<div class="rrow"><span class="mono struck">${esc(s)}</span></div>`;
+  const CAP = 12;
+  const hitIdx = suffixes.indexOf(suffix);
+  let shown = suffixes;
+  let hidden = 0;
+  if (suffixes.length > CAP) {
+    shown = suffixes.slice(0, hitIdx >= CAP ? CAP - 1 : CAP);
+    if (hitIdx >= CAP) shown.push(suffix);
+    hidden = suffixes.length - shown.length;
+  }
+  $('rrows').innerHTML = shown.map(rowHtml).join('')
+    + (hidden ? `<div class="rrow rmore"><button type="button" class="morebtn" id="morebtn">+ ${hidden} more</button></div>` : '');
+  if (hidden) $('morebtn').addEventListener('click', () => { $('rrows').innerHTML = suffixes.map(rowHtml).join(''); });
+  $('verdict').textContent = found
+    ? 'your password is in this breach corpus'
+    : 'your password is not in this breach corpus';
+  $('flow').classList.add('on');
+});
+</script>
+</body>
+</html>

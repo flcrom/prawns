@@ -28,6 +28,10 @@ npm start
 
 `GET /api/range/:prefix` returns `{ "prefix": "5BAA", "suffixes": ["61E4...", ...] }`. `GET /healthz` returns readiness. The old raw-password endpoint is gone.
 
+## Frontend
+
+`public/` is the website, served by the same Express app. It hashes the typed password with SHA-1 in the browser (`crypto.subtle`), sends only the first 4 hex characters to `/api/range`, and compares the returned suffixes locally. The page shows that pipeline as it runs: the typed password, the hash with the prefix marked, the prefix on the wire to the server, and the returned suffixes with the caller's own highlighted and the rest struck out. Light by default with a dark toggle. Inter and JetBrains Mono are bundled under their OFL licenses.
+
 Prawns binds to 127.0.0.1 by default. Redigo itself listens on 0.0.0.0:6379 and has no setting for that, so restrict port 6379 at the firewall. Behind a reverse proxy or tunnel, every request may look like one client to the rate limiter.
 
 ## Test
@@ -38,4 +42,3 @@ REDIGO_BIN=/path/to/redigo npm test        # adds the ingest test against a real
 node scripts/loadcheck.js --file words.txt --prefix-len 4   # concurrent lookups against a running API
 ```
 
-The frontend is not built yet.

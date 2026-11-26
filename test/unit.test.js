@@ -49,8 +49,12 @@ test('api: a half-loaded store (status loading) is not ready', async () => {
 test('api: rate limit', async () => {
   const app = createApp({ store: fake({}), rateLimitPerMin: 2 });
   const s = app.listen(0, '127.0.0.1'); await new Promise((r) => s.once('listening', r));
-  const u = `http://127.0.0.1:${s.address().port}/healthz`;
-  const codes = []; for (let i = 0; i < 3; i++) codes.push((await fetch(u)).status);
-  s.close();
+  const base = `http://127.0.0.1:${s.address().port}`;
+  const codes = []; for (let i = 0; i < 3; i++) codes.push((await fetch(`${base}/api/range/5BAA`)).status);
+  // lookups are throttled...
   assert.strictEqual(codes[2], 429);
+  // ...but the budget is scoped to /api: health checks (and static assets) are not throttled
+  const h = []; for (let i = 0; i < 3; i++) h.push((await fetch(`${base}/healthz`)).status);
+  s.close();
+  assert.strictEqual(h[2], 503);
 });
