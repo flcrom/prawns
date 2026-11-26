@@ -2,8 +2,8 @@
 const $ = id => document.getElementById(id);
 const root = document.documentElement;
 
-// theme: light default, toggle persists; icon color comes from CSS (currentColor = --ink)
-try { if (localStorage.getItem('prawns-theme') === 'dark') root.classList.add('dark'); } catch {}
+// theme: dark default, toggle persists; icon color comes from CSS (currentColor = --ink)
+try { if (localStorage.getItem('prawns-theme') === 'light') root.classList.remove('dark'); } catch {}
 $('tgl').addEventListener('click', () => {
   root.classList.toggle('dark');
   try { localStorage.setItem('prawns-theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch {}
