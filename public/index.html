@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Prawns checks whether a password appears in a breach corpus using k-anonymity: only the first 4 characters of the hash are looked up.">
 <title>prawns</title>
 <link rel="icon" type="image/png" href="prawn.png">
+<script>try{if(localStorage.getItem('prawns-theme')==='light')document.documentElement.classList.remove('dark')}catch{}</script>
 <style>
 @font-face{font-family:Inter;src:url(fonts/var-Inter.woff2) format('woff2');font-weight:100 900;font-display:swap}
 @font-face{font-family:JBM;src:url(fonts/var-JetBrainsMono.woff2) format('woff2');font-weight:100 800;font-display:swap}
-:root{--bg:#fff;--ink:#101010;--ink2:#8a8a8a;--line:#e5e5e5;--invb:#101010;--invi:#fff}
-html.dark{--bg:#0c0c0c;--ink:#f4f4f4;--ink2:#9c9c9c;--line:#262626;--invb:#f4f4f4;--invi:#0c0c0c}
+:root{--bg:#fff;--ink:#101010;--ink2:#8a8a8a;--line:#e5e5e5;--invb:#101010;--invi:#fff;color-scheme:light}
+html.dark{--bg:#0c0c0c;--ink:#f4f4f4;--ink2:#9c9c9c;--line:#262626;--invb:#f4f4f4;--invi:#0c0c0c;color-scheme:dark}
 *{margin:0;box-sizing:border-box}
 html,body{background:var(--bg)}
 body{color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
@@ -143,6 +144,6 @@ html.dark .bgl i{opacity:.13}
     <div class="rrows" id="rrows" tabindex="0" aria-label="returned hash suffixes"></div>
   </div>
 </div>
-<script src="/app.js?v=fd0b3e4" defer></script>
+<script src="/app.js?v=d6b8bec" defer></script>
 </body>
 </html>
