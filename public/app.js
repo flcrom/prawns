@@ -15,13 +15,33 @@ $('rrows').addEventListener('scroll', () => {
   b.classList.toggle('more-below', b.scrollTop + b.clientHeight < b.scrollHeight - 2);
 }, {passive: true});
 
-// briefly reveal the last typed character at its position, then mask it again.
-// the real input stays type=password; only a single freshly typed char is shown,
-// never the whole value, and never pasted/autofilled (multi-char) insertions.
+// briefly reveal the last typed character in place of its mask dot, then let the
+// dot fade back in. the real input stays type=password; only a single freshly
+// typed char is shown, never the whole value, and never pasted/autofilled
+// (multi-char) insertions. the hint carries an opaque background so it covers
+// the dot it stands in for: without it both the char and its dot show at once.
 let pwPrev = '';
 let hintTimer = 0;
 const hint = $('keyhint');
 function hideHint(){ clearTimeout(hintTimer); hint.style.opacity = 0; }
+// the browser's mask dot is not necessarily the font's bullet glyph, so measure
+// its true advance from an offscreen password input instead of guessing it.
+function dotAdvance(i, cs){
+  const m = document.createElement('input');
+  m.type = 'password';
+  m.tabIndex = -1;
+  m.setAttribute('aria-hidden', 'true');
+  m.style.cssText = 'position:absolute;left:-9999px;top:-9999px;margin:0;border:0;padding:0;visibility:hidden;'
+    + `font:${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily};letter-spacing:${cs.letterSpacing};`;
+  document.body.appendChild(m);
+  m.value = '0'.repeat(50);
+  const a = m.scrollWidth;
+  m.value = '0'.repeat(70);
+  const b = m.scrollWidth;
+  m.remove();
+  const w = (b - a) / 20;
+  return w > 0 && isFinite(w) ? w : 0;
+}
 function revealChar(ch, idx){
   const i = $('pw');
   const cs = getComputedStyle(i);
@@ -29,14 +49,25 @@ function revealChar(ch, idx){
   cv.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
   const ls = parseFloat(cs.letterSpacing) || 0;
   const cw = cv.measureText('X').width + ls;
+  const dw = dotAdvance(i, cs) || cw;
   const padL = parseFloat(cs.paddingLeft) || 0;
+  const cellX = i.offsetLeft + padL + idx * dw - i.scrollLeft;
   hint.style.font = `${cs.fontWeight} ${cs.fontSize}/${cs.lineHeight} ${cs.fontFamily}`;
   hint.style.letterSpacing = cs.letterSpacing;
-  hint.style.left = (i.offsetLeft + padL + idx * cw - i.scrollLeft) + 'px';
+  // cover the dot's whole cell (2px bleed each way for sub-pixel rounding);
+  // padding-left puts the char back at the cell's exact start
+  hint.style.left = (cellX - 2) + 'px';
+  hint.style.width = (dw + 4) + 'px';
+  hint.style.paddingLeft = '2px';
   hint.style.top = i.offsetTop + 'px';
   hint.style.height = i.offsetHeight + 'px';
   hint.textContent = ch;
+  // appear instantly so the covered dot never ghosts through; the CSS
+  // transition still applies to the fade back into the dot
+  hint.style.transition = 'none';
   hint.style.opacity = 1;
+  void hint.offsetHeight;
+  hint.style.transition = '';
   clearTimeout(hintTimer);
   hintTimer = setTimeout(hideHint, 650);
 }
