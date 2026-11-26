@@ -55,13 +55,15 @@ html.dark .logo{filter:invert(1)}
 .rmore{text-align:center;border-bottom:none}
 .morebtn{background:none;border:none;cursor:pointer;font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);padding:4px}
 .box4{border:1px solid var(--ink);padding:1px 3px}
-.verdict{margin:0 20px 60px;text-align:center}
+.verdict{display:none;margin:30px 20px 0;font:400 15px/1.6 Inter,system-ui,sans-serif;color:var(--ink)}
+.verdict.on{display:block}
 button:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
 @media (min-width:1000px){
  .hdr{padding:22px 40px}
  .field{margin:130px auto 0;max-width:880px;padding:0}
  .fin input{font-size:44px}
  .note{margin:14px auto 0;max-width:880px}
+ .verdict{margin:34px auto 0;max-width:880px;font-size:16px}
  .flow{flex-direction:row;align-items:center;justify-content:space-between;width:880px;max-width:100%;margin:96px auto 60px;padding:0}
  .steps{display:flex;flex-direction:column;flex:0 0 360px;min-width:0}
  .n3row{display:flex;align-items:center;width:520px}
@@ -88,6 +90,7 @@ button:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
   </div>
 </form>
 <div class="note" id="note"></div>
+<div class="verdict" id="verdict"></div>
 <div class="flow" id="flow">
   <div class="steps">
     <div class="node n1"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="5" y="1.5" width="8" height="15" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/><line x1="8" y1="13.8" x2="10" y2="13.8" stroke="currentColor" stroke-width="1"/></svg><div class="nt"><span class="lbl">you type</span><span class="dots" id="dots"></span></div></div>
@@ -104,7 +107,6 @@ button:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
     <div class="rrows" id="rrows"></div>
   </div>
 </div>
-<div class="verdict lbl" id="verdict"></div>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
@@ -142,11 +144,17 @@ function esc(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+let corpus = null;
+fetch('/healthz').then(r => r.ok ? r.json() : null).then(h => {
+  if (h && h.ready && typeof h.entries === 'number') corpus = h.entries.toLocaleString('en-US');
+}).catch(() => {});
+
 let seq = 0;
 $('pw').addEventListener('input', () => {
   seq++; // invalidate any in-flight lookup
   $('flow').classList.remove('on');
   $('verdict').textContent = '';
+  $('verdict').classList.remove('on');
   note('');
 });
 $('form').addEventListener('submit', async ev => {
@@ -198,9 +206,11 @@ $('form').addEventListener('submit', async ev => {
   $('rrows').innerHTML = shown.map(rowHtml).join('')
     + (hidden ? `<div class="rrow rmore"><button type="button" class="morebtn" id="morebtn">+ ${hidden} more</button></div>` : '');
   if (hidden) $('morebtn').addEventListener('click', () => { $('rrows').innerHTML = suffixes.map(rowHtml).join(''); });
+  const scope = corpus ? `the RockYou sample (${corpus} passwords checked)` : 'the RockYou sample';
   $('verdict').textContent = found
-    ? 'your password is in this breach corpus'
-    : 'your password is not in this breach corpus';
+    ? `This password is in ${scope}. Don't use it anywhere.`
+    : `This password is not in ${scope}. That doesn't make it safe; this is one dataset, not every breach.`;
+  $('verdict').classList.add('on');
   $('flow').classList.add('on');
 });
 </script>
