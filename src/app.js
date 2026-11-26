@@ -1,4 +1,5 @@
 'use strict';
+const { spawn } = require('child_process');
 const express = require('express');
 const { isValidPrefix, listKey, META_KEY } = require('./lib/hash');
 
@@ -37,6 +38,21 @@ function createApp({ store, rateLimitPerMin = 120 }) {
     }
   });
 
+
+// Android lookup notification (deployment feature): surfaces each range lookup's
+// k-anonymity prefix. Only the prefix the client sent is shown - the API never
+// sees passwords or full hashes. --id replaces the previous notification so a
+// burst of lookups updates one notice instead of flooding the shade.
+function notifyLookup(prefix) {
+  try {
+    const child = spawn('termux-notification', ['--id', 'prawns-lookup', '--title', 'Prawns lookup', '--content', 'hash prefix ' + prefix.toUpperCase()], { stdio: ['ignore', 'pipe', 'pipe'] });
+    child.on('error', () => {});
+    if (child.stdout) child.stdout.resume();
+    if (child.stderr) child.stderr.resume();
+    child.unref();
+  } catch { /* notification is best-effort */ }
+}
+
   // k-anonymity range lookup: the client sends only the hash prefix.
   app.get('/api/range/:prefix', async (req, res) => {
     try {
@@ -45,6 +61,7 @@ function createApp({ store, rateLimitPerMin = 120 }) {
       if (!isValidPrefix(req.params.prefix, meta.prefixLen)) {
         return res.status(400).json({ error: 'bad_prefix', prefixLen: meta.prefixLen });
       }
+      notifyLookup(req.params.prefix);
       const suffixes = await store.command('LRANGE', listKey(req.params.prefix), 0, -1);
       res.set('Cache-Control', 'no-store');
       res.json({ prefix: req.params.prefix.toUpperCase(), suffixes: suffixes || [] });
