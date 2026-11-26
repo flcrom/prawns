@@ -10,11 +10,14 @@ function createApp({ store, rateLimitPerMin = 120 }) {
   app.disable('x-powered-by');
 
   const hits = new Map();
-  // Only API lookups count against the budget: static assets must not 429 the page,
-  // and behind the tunnel every visitor shares one req.ip.
+  // Only API lookups count against the budget: static assets must not 429 the page.
+  // Client key: CF-Connecting-IP is set/overwritten by the Cloudflare edge, and the
+  // origin listens on loopback so the only inbound path is cloudflared itself; a
+  // client-supplied value never survives the edge. Fall back to the socket address
+  // for direct local callers (watchdog probes, tests).
   app.use('/api', (req, res, next) => {
     const now = Date.now();
-    const key = req.ip;
+    const key = req.get('cf-connecting-ip') || req.ip;
     const rec = hits.get(key) || { n: 0, reset: now + 60000 };
     if (now > rec.reset) { rec.n = 0; rec.reset = now + 60000; }
     rec.n++;
