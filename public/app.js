@@ -84,18 +84,13 @@ $('form').addEventListener('submit', async ev => {
     s === suffix
       ? `<div class="rhit"><span class="mono">${esc(s)}</span><span class="lbl">yours</span></div>`
       : `<div class="rrow"><span class="mono struck">${esc(s)}</span></div>`;
-  const CAP = 12;
   const hitIdx = suffixes.indexOf(suffix);
-  let shown = suffixes;
-  let hidden = 0;
-  if (suffixes.length > CAP) {
-    shown = suffixes.slice(0, hitIdx >= CAP ? CAP - 1 : CAP);
-    if (hitIdx >= CAP) shown.push(suffix);
-    hidden = suffixes.length - shown.length;
+  $('rrows').innerHTML = suffixes.map(rowHtml).join('');
+  if (hitIdx >= 0) {
+    const box = $('rrows');
+    const hit = box.querySelector('.rhit');
+    if (hit) box.scrollTop += hit.getBoundingClientRect().top - box.getBoundingClientRect().top - 6;
   }
-  $('rrows').innerHTML = shown.map(rowHtml).join('')
-    + (hidden ? `<div class="rrow rmore"><button type="button" class="morebtn" id="morebtn">+ ${hidden} more</button></div>` : '');
-  if (hidden) $('morebtn').addEventListener('click', () => { $('rrows').innerHTML = suffixes.map(rowHtml).join(''); });
   const scope = corpus ? `the RockYou sample (${corpus} passwords checked)` : 'the RockYou sample';
   $('verdict').textContent = found
     ? `This password is in ${scope}. Don't use it anywhere.`
