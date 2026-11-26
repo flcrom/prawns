@@ -169,10 +169,12 @@ $('form').addEventListener('submit', async ev => {
   const hitIdx = suffixes.indexOf(suffix);
   $('rrows').innerHTML = suffixes.map(rowHtml).join('');
   const scope = corpus ? `the RockYou sample (${corpus} passwords checked)` : 'the RockYou sample';
-  $('verdict').textContent = found
-    ? `This password is in ${scope}. Don't use it anywhere.`
-    : `This password is not in ${scope}. That doesn't make it safe; this is one dataset, not every breach.`;
-  $('verdict').classList.add('on');
+  if (found) {
+    $('verdict').textContent = '';
+  } else {
+    $('verdict').textContent = `This password is not in ${scope}. That doesn't make it safe; this is one dataset, not every breach.`;
+    $('verdict').classList.add('on');
+  }
   $('flow').classList.add('on');
   // only after .flow is visible do the box's dimensions exist; pin the match and set the fade now
   const box = $('rrows');
