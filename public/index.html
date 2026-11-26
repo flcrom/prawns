@@ -38,6 +38,7 @@ html.dark .logo{filter:invert(1)}
 .node>svg{flex:0 0 auto;color:var(--ink)}
 .nt{min-width:0;flex:1}
 .nt .lbl{display:block;margin-bottom:5px}
+.nmeta{flex:0 0 auto;font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
 .dots{font-family:JBM,monospace;font-size:13px;letter-spacing:2px}
 .hashline{font-family:JBM,monospace;display:block;font-size:11px;letter-spacing:.02em;line-height:1.9;word-break:break-all}
 .wire{position:relative;height:40px;flex:0 0 auto;color:var(--ink)}
@@ -86,6 +87,7 @@ button:focus-visible,[tabindex]:focus-visible{outline:1px solid var(--ink);outli
  .node{padding:17px 18px;gap:16px}
  .node>svg{width:24px;height:24px}
  .nt .lbl{font-size:11px}
+ .nmeta{font-size:11px}
  .dots{font-size:17px}
  .hashline{font-size:13px}
  .wire{height:52px}
@@ -138,7 +140,7 @@ html.dark .bgl i{opacity:.13}
     <div class="node n2"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="1.5" y="3" width="15" height="12.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/><line x1="1.5" y1="7" x2="16.5" y2="7" stroke="currentColor" stroke-width="1"/><circle cx="4" cy="5" r="0.9" fill="currentColor"/><circle cx="6.6" cy="5" r="0.9" fill="currentColor"/></svg><div class="nt"><span class="lbl">browser hashes · sha-1</span><span class="hashline" id="hashline"></span></div></div>
     <div class="wire w2"><span class="wl"></span><svg class="ah ah-v" width="11" height="7" viewBox="0 0 11 7"><path d="M0.5 0.5 L5.5 6.5 L10.5 0.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><svg class="ah ah-h" width="7" height="11" viewBox="0 0 7 11"><path d="M0.5 0.5 L6.5 5.5 L0.5 10.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="wchip mono" id="chip"></span></div>
     <div class="n3row">
-      <div class="node n3"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="2.5" y="2" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="7.5" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="13" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="5" cy="4" r="0.9" fill="currentColor"/><circle cx="5" cy="9.5" r="0.9" fill="currentColor"/><circle cx="5" cy="15" r="0.9" fill="currentColor"/></svg><div class="nt"><span class="lbl">server</span></div></div>
+      <div class="node n3"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="2.5" y="2" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="7.5" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="13" width="13" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="5" cy="4" r="0.9" fill="currentColor"/><circle cx="5" cy="9.5" r="0.9" fill="currentColor"/><circle cx="5" cy="15" r="0.9" fill="currentColor"/></svg><div class="nt"><span class="lbl">server</span></div><span class="nmeta">pixel 6a</span></div>
       <div class="wire w3"><span class="wl"></span><svg class="ah ah-v" width="11" height="7" viewBox="0 0 11 7"><path d="M0.5 0.5 L5.5 6.5 L10.5 0.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><svg class="ah ah-h" width="7" height="11" viewBox="0 0 7 11"><path d="M0.5 0.5 L6.5 5.5 L0.5 10.5" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="wlbl lbl" id="w3lbl"></span></div>
     </div>
   </div>
