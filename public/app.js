@@ -9,6 +9,12 @@ $('tgl').addEventListener('click', () => {
   try { localStorage.setItem('prawns-theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch {}
 });
 
+// keep the candidate-box fade in sync with its scroll position
+$('rrows').addEventListener('scroll', () => {
+  const b = $('rrows');
+  b.classList.toggle('more-below', b.scrollTop + b.clientHeight < b.scrollHeight - 2);
+}, {passive: true});
+
 // show/hide password
 $('eye').addEventListener('click', () => {
   const i = $('pw');
@@ -86,11 +92,12 @@ $('form').addEventListener('submit', async ev => {
       : `<div class="rrow"><span class="mono struck">${esc(s)}</span></div>`;
   const hitIdx = suffixes.indexOf(suffix);
   $('rrows').innerHTML = suffixes.map(rowHtml).join('');
+  const box = $('rrows');
   if (hitIdx >= 0) {
-    const box = $('rrows');
     const hit = box.querySelector('.rhit');
     if (hit) box.scrollTop += hit.getBoundingClientRect().top - box.getBoundingClientRect().top - 6;
   }
+  box.classList.toggle('more-below', box.scrollTop + box.clientHeight < box.scrollHeight - 2);
   const scope = corpus ? `the RockYou sample (${corpus} passwords checked)` : 'the RockYou sample';
   $('verdict').textContent = found
     ? `This password is in ${scope}. Don't use it anywhere.`
