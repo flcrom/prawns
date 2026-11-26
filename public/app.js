@@ -21,9 +21,9 @@ $('rrows').addEventListener('scroll', () => {
 // (multi-char) insertions. the hint carries an opaque background so it covers
 // the dot it stands in for: without it both the char and its dot show at once.
 let pwPrev = '';
-let hintTimer = 0;
+let hintTimer = 0, hintRaf = 0;
 const hint = $('keyhint');
-function hideHint(){ clearTimeout(hintTimer); hint.style.opacity = 0; }
+function hideHint(){ clearTimeout(hintTimer); cancelAnimationFrame(hintRaf); hint.style.opacity = 0; }
 // the browser's mask dot is not necessarily the font's bullet glyph, so measure
 // its true advance from an offscreen password input instead of guessing it.
 function dotAdvance(i, cs){
@@ -51,23 +51,29 @@ function revealChar(ch, idx){
   const cw = cv.measureText('X').width + ls;
   const dw = dotAdvance(i, cs) || cw;
   const padL = parseFloat(cs.paddingLeft) || 0;
-  const cellX = i.offsetLeft + padL + idx * dw - i.scrollLeft;
   hint.style.font = `${cs.fontWeight} ${cs.fontSize}/${cs.lineHeight} ${cs.fontFamily}`;
   hint.style.letterSpacing = cs.letterSpacing;
-  // cover the dot's whole cell (2px bleed each way for sub-pixel rounding);
-  // padding-left puts the char back at the cell's exact start
-  hint.style.left = (cellX - 2) + 'px';
   hint.style.width = (dw + 4) + 'px';
   hint.style.paddingLeft = '2px';
   hint.style.top = i.offsetTop + 'px';
   hint.style.height = i.offsetHeight + 'px';
   hint.textContent = ch;
-  // appear instantly so the covered dot never ghosts through; the CSS
-  // transition still applies to the fade back into the dot
-  hint.style.transition = 'none';
-  hint.style.opacity = 1;
-  void hint.offsetHeight;
-  hint.style.transition = '';
+  // the browser scrolls the caret into view only after the input event, so a
+  // position read now would use a stale scrollLeft once the value overflows
+  // the field; place the hint on the next frame, when scrolling has settled
+  cancelAnimationFrame(hintRaf);
+  hintRaf = requestAnimationFrame(() => {
+    const cellX = i.offsetLeft + padL + idx * dw - i.scrollLeft;
+    // cover the dot's whole cell (2px bleed each way for sub-pixel rounding);
+    // padding-left puts the char back at the cell's exact start
+    hint.style.left = (cellX - 2) + 'px';
+    // appear instantly so the covered dot never ghosts through; the CSS
+    // transition still applies to the fade back into the dot
+    hint.style.transition = 'none';
+    hint.style.opacity = 1;
+    void hint.offsetHeight;
+    hint.style.transition = '';
+  });
   clearTimeout(hintTimer);
   hintTimer = setTimeout(hideHint, 650);
 }
