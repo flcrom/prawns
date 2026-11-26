@@ -131,16 +131,17 @@ $('form').addEventListener('submit', async ev => {
       : `<div class="rrow"><span class="mono struck">${esc(s)}</span></div>`;
   const hitIdx = suffixes.indexOf(suffix);
   $('rrows').innerHTML = suffixes.map(rowHtml).join('');
-  const box = $('rrows');
-  if (hitIdx >= 0) {
-    const hit = box.querySelector('.rhit');
-    if (hit) box.scrollTop += hit.getBoundingClientRect().top - box.getBoundingClientRect().top - 6;
-  }
-  box.classList.toggle('more-below', box.scrollTop + box.clientHeight < box.scrollHeight - 2);
   const scope = corpus ? `the RockYou sample (${corpus} passwords checked)` : 'the RockYou sample';
   $('verdict').textContent = found
     ? `This password is in ${scope}. Don't use it anywhere.`
     : `This password is not in ${scope}. That doesn't make it safe; this is one dataset, not every breach.`;
   $('verdict').classList.add('on');
   $('flow').classList.add('on');
+  // only after .flow is visible do the box's dimensions exist; pin the match and set the fade now
+  const box = $('rrows');
+  if (hitIdx >= 0) {
+    const hit = box.querySelector('.rhit');
+    if (hit) box.scrollTop += hit.getBoundingClientRect().top - box.getBoundingClientRect().top - 6;
+  }
+  box.classList.toggle('more-below', box.scrollTop + box.clientHeight < box.scrollHeight - 2);
 });
