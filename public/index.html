@@ -20,14 +20,16 @@ body{color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smooth
 .logo{height:36px;width:auto;display:block}
 html.dark .logo{filter:invert(1)}
 .tgl{background:none;border:none;color:var(--ink);padding:6px;cursor:pointer;display:flex}
-.field{margin:86px 20px 0}
+.field{margin:44px 20px 0}
 .fin{width:100%;display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid var(--ink);padding-bottom:10px}
 .fin input{font:400 24px JBM,monospace;letter-spacing:.5px;flex:1;min-width:0;background:none;border:none;outline:none;color:var(--ink);padding:0;caret-color:var(--ink)}
 .fin input::placeholder{color:var(--ink2);opacity:.55}
 .eye{background:none;border:none;color:var(--ink2);padding:4px;cursor:pointer;display:flex}
-.cap{border:1px solid var(--line);border-radius:3px;padding:3px 7px;font:500 10px JBM,monospace;color:var(--ink2);background:none;cursor:pointer}
+.go{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:none;background:var(--invb);color:var(--invi);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;margin-bottom:1px}
+.go svg{width:17px;height:17px;display:block}
+.go:hover{opacity:.85}
 .note{margin:14px 20px 0;font:500 10px Inter;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);display:none}
-.flow{margin:52px 20px 60px;display:none;flex-direction:column}
+.flow{margin:32px 20px 60px;display:none;flex-direction:column}
 .flow.on{display:flex}
 .steps,.n3row{display:contents}
 .node{display:flex;align-items:center;gap:14px;border:1px solid var(--line);padding:13px 14px;background:var(--bg)}
@@ -60,11 +62,13 @@ html.dark .logo{filter:invert(1)}
 button:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
 @media (min-width:1000px){
  .hdr{padding:22px 40px}
- .field{margin:130px auto 0;max-width:880px;padding:0}
+ .field{margin:52px auto 0;max-width:880px;padding:0}
  .fin input{font-size:44px}
  .note{margin:14px auto 0;max-width:880px}
  .verdict{margin:34px auto 0;max-width:880px;font-size:16px}
- .flow{flex-direction:row;align-items:center;justify-content:space-between;width:880px;max-width:100%;margin:96px auto 60px;padding:0}
+ .flow{flex-direction:row;align-items:center;justify-content:space-between;width:880px;max-width:100%;margin:44px auto 60px;padding:0}
+ .go{width:44px;height:44px;margin-bottom:3px}
+ .go svg{width:20px;height:20px}
  .steps{display:flex;flex-direction:column;flex:0 0 360px;min-width:0}
  .n3row{display:flex;align-items:center;width:520px}
  .n3{flex:1;min-width:0}
@@ -86,7 +90,7 @@ button:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
   <div class="fin">
     <input id="pw" type="password" placeholder="password" aria-label="password to check" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus>
     <button type="button" class="eye" id="eye" aria-label="show password"><svg width="22" height="22" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/></svg></button>
-    <button type="submit" class="cap" aria-label="check password">return</button>
+    <button type="submit" class="go" aria-label="check password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 5.5 19.5 12 13 18.5"/></svg></button>
   </div>
 </form>
 <div class="note" id="note"></div>
